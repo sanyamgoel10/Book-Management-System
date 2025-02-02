@@ -1,4 +1,5 @@
 const { getRowData, getAllData, setData } = require("../services/db.js");
+const encDecPassword = require('../services/encDecPassword.js');
 
 class UserController{
     async registerUser(req, res){
@@ -22,7 +23,9 @@ class UserController{
                 });
             }
 
-            let insertUser = await setData(`insert into users (username, password) values (?, ?)`, [reqBody.username, reqBody.password]);
+            let encryptedPass = await encDecPassword.hashPassword(reqBody.password);
+
+            let insertUser = await setData(`insert into users (username, password) values (?, ?)`, [reqBody.username, encryptedPass]);
 
             return res.status(201).json({
                 message: "User registered successfully",
