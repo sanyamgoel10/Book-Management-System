@@ -43,12 +43,14 @@ class UserController{
         try {
             let reqBody = req.body;
 
-            if('undefined' == typeof reqBody.user_id || !(/^\d+$/).test(reqBody.user_id) || Number(reqBody.user_id) < 1){
-                return res.status(400).json({
-                    message: "user_id missing in request" 
-                });
-            }
-            reqBody.user_id = Number(reqBody.user_id);
+            // if('undefined' == typeof reqBody.user_id || !(/^\d+$/).test(reqBody.user_id) || Number(reqBody.user_id) < 1){
+            //     return res.status(400).json({
+            //         message: "user_id missing in request" 
+            //     });
+            // }
+            // reqBody.user_id = Number(reqBody.user_id);
+
+            reqBody.user_id = Number(req.user_id);
 
             if('undefined' == typeof reqBody.book_id || (!(/^\d+$/).test(reqBody.book_id) && !Array.isArray(reqBody.book_id))){
                 return res.status(400).json({
@@ -83,12 +85,12 @@ class UserController{
                 booksList = [...(reqBody.book_id)];
             }
 
-            let checkUser = await getRowData(`select id from users where id = ?`, [reqBody.user_id]);
-            if('undefined' == typeof checkUser){
-                return res.status(404).json({
-                    message: "user_id not found"
-                });
-            }
+            // let checkUser = await getRowData(`select id from users where id = ?`, [reqBody.user_id]);
+            // if('undefined' == typeof checkUser){
+            //     return res.status(404).json({
+            //         message: "user_id not found"
+            //     });
+            // }
 
             let placeHolders = booksList.map(() => "?").join(", ");
             let checkBooks = await getAllData(`select id from books where id in (${placeHolders})`, booksList);
@@ -117,12 +119,14 @@ class UserController{
         try {
             let reqBody = req.body;
 
-            if('undefined' == typeof reqBody.user_id || !(/^\d+$/).test(reqBody.user_id) || Number(reqBody.user_id) < 1){
-                return res.status(400).json({
-                    message: "user_id missing in request" 
-                });
-            }
-            reqBody.user_id = Number(reqBody.user_id);
+            reqBody.user_id = Number(req.user_id);
+
+            // if('undefined' == typeof reqBody.user_id || !(/^\d+$/).test(reqBody.user_id) || Number(reqBody.user_id) < 1){
+            //     return res.status(400).json({
+            //         message: "user_id missing in request" 
+            //     });
+            // }
+            // reqBody.user_id = Number(reqBody.user_id);
 
             if('undefined' == typeof reqBody.book_id || !(/^\d+$/).test(reqBody.book_id) || Number(reqBody.book_id) < 1){
                 return res.status(400).json({
