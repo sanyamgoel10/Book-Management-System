@@ -32,7 +32,7 @@ class BookController{
 
             let checkExistingBook = await getRowData(`select *, id, title, author, genre, published_year from books where title = ? and author = ?`, [reqBody.title, reqBody.author]);
             if('undefined' != typeof checkExistingBook && 'object' == typeof checkExistingBook){
-                return res.status(404).json({
+                return res.status(409).json({
                     message: `Book already present`,
                     book_id: checkExistingBook.id,
                     book_title: checkExistingBook.title,
@@ -44,7 +44,7 @@ class BookController{
 
             let insertBook = await setData(`insert into books (title, author, genre, published_year) values (?, ?, ?, ?)`, [reqBody.title, reqBody.author, reqBody.genre, reqBody.published_year]);
 
-            return res.status(200).json({ 
+            return res.status(201).json({ 
                 message: "Book registered successfully",
                 book_id: insertBook
             });
@@ -138,7 +138,7 @@ class BookController{
             let reqParam = req.params;
 
             if('undefined' == typeof reqParam.book_id || !(/^\d+$/).test(reqParam.book_id) || Number(reqParam.book_id) < 1){
-                return res.status(404).json({
+                return res.status(400).json({
                     message: "book_id missing in request"
                 });
             }
@@ -160,22 +160,22 @@ class BookController{
             let newPY = ('undefined' != typeof reqBody.published_year && reqBody.published_year != null) ? reqBody.published_year: null;
 
             if(newTitle != null && !checkValidString(newTitle)){
-                return res.status(404).json({
+                return res.status(400).json({
                     message: "title should be non empty string"
                 });
             }
             if(newAuthor != null && !checkValidString(newAuthor)){
-                return res.status(404).json({
+                return res.status(400).json({
                     message: "author should be non empty string"
                 });
             }
             if(newGenre != null && !checkValidString(newGenre)){
-                return res.status(404).json({
+                return res.status(400).json({
                     message: "genre should be non empty string"
                 });
             }
             if(newPY != null && (!(/^\d+$/).test(newPY) || Number(newPY) <= 0)){
-                return res.status(404).json({
+                return res.status(400).json({
                     message: "published_year should be positive number"
                 });
             }
@@ -184,21 +184,21 @@ class BookController{
             if(newTitle != null && newAuthor != null){
                 let checkDuplBook = await getRowData(`select id from books where id != ? and title = ? and author = ?`, [reqParam.book_id, newTitle, newAuthor]);
                 if('undefined' != typeof checkDuplBook){
-                    return res.status(404).json({
+                    return res.status(409).json({
                         message: "Book already found with same title and author"
                     });
                 }
             }else if(newTitle != null){
                 let checkDuplBook = await getRowData(`select id from books where id != ? and title = ? and author = ?`, [reqParam.book_id, newTitle, currAuthor]);
                 if('undefined' != typeof checkDuplBook){
-                    return res.status(404).json({
+                    return res.status(409).json({
                         message: "Book already found with same title and author"
                     });
                 }
             }else if(newAuthor != null){
                 let checkDuplBook = await getRowData(`select id from books where id != ? and title = ? and author = ?`, [reqParam.book_id, currTitle, newAuthor]);
                 if('undefined' != typeof checkDuplBook){
-                    return res.status(404).json({
+                    return res.status(409).json({
                         message: "Book already found with same title and author"
                     });
                 }
@@ -246,7 +246,7 @@ class BookController{
             let reqParam = req.params;
 
             if('undefined' == typeof reqParam.book_id || !(/^\d+$/).test(reqParam.book_id) || Number(reqParam.book_id) < 1){
-                return res.status(404).json({
+                return res.status(400).json({
                     message: "book_id missing in request"
                 });
             }

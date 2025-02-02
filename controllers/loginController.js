@@ -17,14 +17,14 @@ class UserController{
             }
             let checkUserName = await getRowData(`select * from users where username = ?`, [reqBody.username]);
             if('undefined' != typeof checkUserName){
-                return res.status(404).json({ 
+                return res.status(409).json({
                     message: "username already found" 
                 });
             }
 
             let insertUser = await setData(`insert into users (username, password) values (?, ?)`, [reqBody.username, reqBody.password]);
 
-            return res.status(200).json({ 
+            return res.status(201).json({
                 message: "User registered successfully",
                 user_id: insertUser
             });
@@ -41,14 +41,14 @@ class UserController{
             let reqBody = req.body;
 
             if('undefined' == typeof reqBody.user_id || !(/^\d+$/).test(reqBody.user_id) || Number(reqBody.user_id) < 1){
-                return res.status(404).json({ 
+                return res.status(400).json({
                     message: "user_id missing in request" 
                 });
             }
             reqBody.user_id = Number(reqBody.user_id);
 
             if('undefined' == typeof reqBody.book_id || (!(/^\d+$/).test(reqBody.book_id) && !Array.isArray(reqBody.book_id))){
-                return res.status(404).json({ 
+                return res.status(400).json({
                     message: "book_id missing in request" 
                 });
             }
@@ -56,7 +56,7 @@ class UserController{
             let booksList = [];
             if((/^\d+$/).test(reqBody.book_id)){
                 if(Number(reqBody.book_id) < 1){
-                    return res.status(404).json({ 
+                    return res.status(400).json({
                         message: "book_id should be positive integer" 
                     });
                 }
@@ -73,7 +73,7 @@ class UserController{
                     reqBody.book_id[i] = Number(reqBody.book_id[i]);
                 }
                 if((reqBody.book_id).length < 1 || allNotNum){
-                    return res.status(404).json({ 
+                    return res.status(400).json({
                         message: "book_id should contain positive integers" 
                     });
                 }
@@ -115,14 +115,14 @@ class UserController{
             let reqBody = req.body;
 
             if('undefined' == typeof reqBody.user_id || !(/^\d+$/).test(reqBody.user_id) || Number(reqBody.user_id) < 1){
-                return res.status(404).json({ 
+                return res.status(400).json({
                     message: "user_id missing in request" 
                 });
             }
             reqBody.user_id = Number(reqBody.user_id);
 
             if('undefined' == typeof reqBody.book_id || !(/^\d+$/).test(reqBody.book_id) || Number(reqBody.book_id) < 1){
-                return res.status(404).json({ 
+                return res.status(400).json({
                     message: "book_id missing in request" 
                 });
             }
@@ -130,14 +130,14 @@ class UserController{
 
             let checkBorrowedBook = await getRowData(`select count(*) as isFound from borrowed_books where user_id = ? and book_id = ? and is_returned = 1`, [reqBody.user_id, reqBody.book_id]);
             if('undefined' != typeof checkBorrowedBook && 'object' == typeof checkBorrowedBook && 'undefined' != typeof checkBorrowedBook.isFound && Number(checkBorrowedBook.isFound) > 0){
-                return res.status(404).json({ 
+                return res.status(400).json({
                     message: "No book present borrowed by user" 
                 });
             }
 
             await setData(`update borrowed_books set return_date = CURRENT_TIMESTAMP, is_returned = 1 where user_id = ? and book_id = ?`, [reqBody.user_id, reqBody.book_id]);
 
-            return res.status(200).json({ 
+            return res.status(200).json({
                 message: "Book returned" 
             });
         } catch (error) {
