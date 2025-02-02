@@ -101,6 +101,15 @@ class UserController{
             }
 
             for(let i in booksList){
+                let checkBookBorrowed = await getRowData(`select user_id, borrow_date from borrowed_books where book_id = ? and is_returned = 0`, [booksList[i]]);
+                if('undefined' != typeof checkBookBorrowed){
+                    return res.status(409).json({
+                        message: `book_id: ${booksList[i]} already borrowed by other user`
+                    });
+                }
+            }
+
+            for(let i in booksList){
                 await setData(`insert or replace into  borrowed_books (user_id, book_id, borrow_date, return_date, is_returned) values (?, ?, CURRENT_TIMESTAMP, NULL, 0)`, [reqBody.user_id, booksList[i]]);
             }
 
